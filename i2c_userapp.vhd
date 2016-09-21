@@ -205,7 +205,7 @@ begin
 				when idle =>
 					if(READ_ENABLE = '1') then
 						i2c_addr <= "10010" & std_logic_vector(to_unsigned(read_cnt,2)) ; 	-- Address of first I2C device
-						i2c_datawr <= "10101010";  			-- Data to enable channel 1											-- TODO Data that will be written to the device
+						i2c_datawr <= '1' & std_logic_vector(to_unsigned(channel_cnt,3) & "0000") ;  			-- Data to enable channel 1											-- TODO Data that will be written to the device
 						i2c_enable <= '1';					-- STart I2C transfer
 						init_cs <= command;					-- Move on to command state
 					end if;				
