@@ -238,6 +238,7 @@ begin
 					end if;
 				when readUpper =>								-- Read upper nibble of 12-bit data and append identifier info
 					i2c_rw <= '1';									-- Hold read flag
+					i2c_enable <= '1';
 					if(i2c_busy = '0' and busy_prev = '1') then     -- When transfer is finished
 						data_in(17 downto 16) <= std_logic_vector(to_unsigned(read_cnt,2)); 	-- Append Device number
 						data_in(15 downto 12) <= std_logic_vector(to_unsigned(channel_cnt,4));  -- Append Channel Number
@@ -246,7 +247,6 @@ begin
 					end if;	
 				when readLower =>
 					i2c_rw <= '1';									-- Hold read flag
-					i2c_enable <= '0';
 					if(i2c_busy = '0' and busy_prev = '1') then     -- Wait for transfer to finish
 						data_in(7 downto 0) <= DATA_RD;			-- Append lower byte of data
 						data_vld <= '1';						-- Push data into fifo
