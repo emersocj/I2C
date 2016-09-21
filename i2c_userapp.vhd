@@ -204,7 +204,7 @@ begin
 					end if;
 				when idle =>
 					if(READ_ENABLE = '1') then
-						i2c_addr <= "10010" & std_logic_vector(to_unsigned(init_cnt,2)) ; 	-- Address of first I2C device
+						i2c_addr <= "10010" & std_logic_vector(to_unsigned(read_cnt,2)) ; 	-- Address of first I2C device
 						i2c_datawr <= "10101010";  			-- Data to enable channel 1											-- TODO Data that will be written to the device
 						i2c_enable <= '1';					-- STart I2C transfer
 						init_cs <= command;					-- Move on to command state
@@ -221,7 +221,7 @@ begin
 							if(retry_cnt = 3) then              -- If failed to initialize 3 times
 								poll_error(init_cnt) <= '1';	-- Set flag that device 1 did not ack
 								retry_rst <= '1';				-- Reset the retry_cnt counter 
-								read_cnt <= init_cnt + 1;		-- Move to next Device
+								read_cnt <= read_cnt + 1;		-- Move to next Device
 								channel_cnt <= 0;				-- Reset channel pointer
 								i2c_enable <= '0';						-- Disable transfer
 								init_cs <= channelSelect;		-- Enter channel select
@@ -257,7 +257,7 @@ begin
 						read_cnt 	<= 0;						
 						channel_cnt <= 0;
 					elsif(channel_cnt = MAXCHANNELS) then
-						read_cnt <= init_cnt + 1;
+						read_cnt <= read_cnt + 1;
 						channel_cnt <= 0;
 					else
 						channel_cnt <= channel_cnt + 1;
