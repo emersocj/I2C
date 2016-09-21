@@ -33,15 +33,16 @@ use IEEE.STD_LOGIC_1164.ALL;
 
 entity i2c_top is
   Port ( 
---  	INIT   			: in        std_logic;
---  	READ_ENABLE     : in        std_logic;
+  	INIT   			: in        std_logic;
+  	READ_ENABLE     : in        std_logic;
   	SDA				: inout		std_logic;
   	SCL             : inout	    std_logic;
---  	DATA_VLD		: out       std_logic;
---  	DATA_OUT        : out       std_logic_vector(17 downto 0);
+  	DATA_VLD		: out       std_logic;
+  	DATA_OUT        : out       std_logic_vector(17 downto 0);
 
+  	RESET_N			: in        std_logic;
     CLK 			: in 		std_logic
---  	RESET_N			: in        std_logic
+
   	);
 end i2c_top;
 
@@ -121,7 +122,7 @@ port map(
 		SDA 		=> 	SDA,
 		SCL 		=>	SCL,
 
-		RESET_N 	=> 	'1',
+		RESET_N 	=> 	RESET_N,
 		CLK 		=> 	CLK
 );
 	
@@ -142,12 +143,12 @@ port map(
 		BUSY       => busy_i,
 		ACK_ERROR  => ack_error_i,
 
-		READ_ENABLE => '1',		
-		INIT       => '0',
-		DATA_VLD   => open,
-		DATA_OUT   => open,
+		READ_ENABLE => READ_ENABLE,		
+		INIT       => INIT,
+		DATA_VLD   => DATA_VLD,
+		DATA_OUT   => DATA_OUT,
 
-		RESET_N	   => '1',
+		RESET_N	   => RESET_N,
 		CLK        => CLK
 	);
 
