@@ -60,7 +60,7 @@ component i2c_userapp is
   	BUSY			: in 	 	std_logic;
   	INIT            : in 		std_logic;
   	READ_ENABLE     : in        std_logic;
-  	ACK_ERROR		: buffer 	std_logic;
+  	ACK_ERROR		: in 		std_logic;
   	RW				: out 		std_logic;
   	ADDR			: out 		std_logic_vector(6 downto 0);
   	ENA 			: out 		std_logic;
@@ -87,7 +87,7 @@ component i2c_master is
     DATA_WR   : in     std_logic_vector(7 downto 0); --data to write to slave
     BUSY      : out    std_logic;                    --indicates transaction in progress
     DATA_RD   : out    std_logic_vector(7 downto 0); --data read from slave
-    ACK_ERROR : buffer std_logic;                    --flag if improper acknowledge from slave
+    ACK_ERROR : out std_logic;                    --flag if improper acknowledge from slave
     SDA       : inout  std_logic;                    --serial data output of i2c bus
     SCL       : inout  std_logic;                    --serial clock output of i2c bus
 

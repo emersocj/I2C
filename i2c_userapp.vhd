@@ -41,7 +41,7 @@ entity i2c_userapp is
   	BUSY			: in 	 	std_logic;
   	INIT            : in 		std_logic;
   	READ_ENABLE     : in        std_logic;
-  	ACK_ERROR		: buffer 	std_logic;
+  	ACK_ERROR		: in 	std_logic;
   	RW				: out 		std_logic;
   	ADDR			: out 		std_logic_vector(6 downto 0);
   	ENA 			: out 		std_logic;
