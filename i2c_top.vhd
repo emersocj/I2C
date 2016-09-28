@@ -35,12 +35,12 @@ entity i2c_top is
   Port ( 
 --  	INIT   			: in        std_logic;
 --  	READ_ENABLE     : in        std_logic;
-  	SDA				: inout		std_logic;
-  	SCL             : inout	    std_logic;
+  	     SDA				: inout		std_logic;
+  	     SCL             : inout	    std_logic;
 --  	DATA_VLD		: out       std_logic;
 --  	DATA_OUT        : out       std_logic_vector(17 downto 0);
 
-    CLK 			: in 		std_logic
+        CLK 			: in 		std_logic
 --  	RESET_N			: in        std_logic
   	);
 end i2c_top;
@@ -51,7 +51,7 @@ component i2c_userapp is
   generic (
   	BUSSIZE    			: integer:=4;
   	MAXCHANNELS 		: integer:= 8;
-    STARTADDRESS		: std_logic_vector:="1010000";
+    STARTADDRESS		: std_logic_vector:="1001000";
     INITDATA			: std_logic_vector:="10101010"
   	);
   Port ( 
@@ -108,7 +108,7 @@ begin
 master: i2c_master 
 generic map(
 		input_clk  => 100_000_000,
-		bus_clk    => 400_000
+		bus_clk    => 390_625
 )
 port map(
 		ENA 		=> 	ena_i,
@@ -129,8 +129,8 @@ user_app: i2c_userapp
 generic map (
   	BUSSIZE    		=> 4,
   	MAXCHANNELS 	=> 8,
-    STARTADDRESS    => "1010000",
-    INITDATA	    => "10101010"
+    STARTADDRESS    => "1001000",
+    INITDATA	    => "10001100"
   	)
 port map(
 		DATA_RD    => data_rd_i,

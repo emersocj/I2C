@@ -34,8 +34,8 @@ use IEEE.NUMERIC_STD.ALL;
 entity i2c_userapp is
   generic (BUSSIZE    		: integer:=4;							-- Number of I2C devices on the bus
   		   MAXCHANNELS 		: integer:= 8;							-- Number of channels on the I2C devices being used( May need to change)
-  		   STARTADDRESS		: std_logic_vector:="1010000";			-- First I2C address
-  		   INITDATA			: std_logic_vector:="10101010"			-- Data sent to the I2C devices to init them
+  		   STARTADDRESS		: std_logic_vector:="0001001";			-- First I2C address "1001000"
+  		   INITDATA			: std_logic_vector:="10000000"			-- Data sent to the I2C devices to init them
   	);
   Port ( 
   	BUSY			: in 	 	std_logic;							-- Indicates that a transfer is occuring
@@ -84,6 +84,7 @@ signal retry_rst   : std_logic:='0';								-- Reset the retry_cnt counter
 signal init_cnt    : integer:=0;
 signal channel_cnt : integer:=0;
 signal read_cnt    : integer:=0;
+signal wait_cnt    : integer:=10000;
 
 
 -- Buffers
@@ -91,7 +92,7 @@ signal dout	   : std_logic_vector(17 downto 0);
 signal i2c_addr    : std_logic_vector(6 downto 0):="0000000";		-- Address buffer
 
 -- I2C UserApp state machine
-type INIT_STATE_TYPE is (start,ena_in,ack_in,next_in,idle,command,commandAck,channelSelect,readUpper,readLower,readAck,done);
+type INIT_STATE_TYPE is (start,ena_in,ack_in,next_in,idle,command,commandAck,channelSelect,readUpper,readLower,readAck,wait_s,done);
 signal init_cs 			: init_state_type:=start;
 
 begin
@@ -207,7 +208,7 @@ begin
 				when idle =>
 					if(READ_ENABLE = '1') then
 						i2c_addr <= "10010" & std_logic_vector(to_unsigned(read_cnt,2)) ; 	-- Address of first I2C device
-						i2c_datawr <= '1' & std_logic_vector(to_unsigned(channel_cnt,3) & "0000") ;  				-- Data to enable channel 1										
+						i2c_datawr <= '1' & std_logic_vector(to_unsigned(channel_cnt,3) & "1100") ;  				-- Data to enable channel 1										
 						i2c_enable <= '1';						-- Start I2C transfer
 						init_cs <= command;						-- Move on to command state
 					end if;				
@@ -264,7 +265,14 @@ begin
 					else
 						channel_cnt <= channel_cnt + 1;			-- Increment channel
 					end if;
-					init_cs <= idle;							-- Move to idle state
+					init_cs <= wait_s;							-- Move to idle state
+				when wait_s =>
+					if(wait_cnt /= 0) then
+						wait_cnt <= wait_cnt - 1;
+					else 
+						wait_cnt <= 1000;
+						init_cs <= idle;
+					end if;
 			-- Unsafe State machine is implemented			
 			when others =>
 				init_cs <= start;
