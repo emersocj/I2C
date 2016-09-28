@@ -259,7 +259,7 @@ begin
 					if(read_cnt = BUSSIZE)then 					-- If at last device
 						read_cnt 	<= 0;						-- Move to first device
 						channel_cnt <= 0;						-- Move to fist channel
-					elsif(channel_cnt = MAXCHANNELS) then       -- If at the last channel
+					elsif(channel_cnt = MAXCHANNELS - 1) then       -- If at the last channel
 						read_cnt <= read_cnt + 1;				-- Move to next device
 						channel_cnt <= 0;						-- Move to first channel
 					else
