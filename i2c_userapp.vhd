@@ -88,7 +88,7 @@ signal wait_cnt    : integer:=10000;
 
 
 -- Buffers
-signal dout	   : std_logic_vector(17 downto 0);
+signal dout	   	   : std_logic_vector(17 downto 0);
 signal i2c_addr    : std_logic_vector(6 downto 0):="0000000";		-- Address buffer
 
 -- I2C UserApp state machine
