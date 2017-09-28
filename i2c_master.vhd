@@ -19,8 +19,8 @@
 --     Initial Public Release
 --   Version 2.0 06/20/2014 Scott Larson
 --     Added ability to interface with different slaves in the same transaction
---     Corrected ack_error bug where ack_error went 'Z' instead of '1' on error
---     Corrected timing of when ack_error signal clears
+--     Corrected ack_r bug where ack_r went 'Z' instead of '1' on error
+--     Corrected timing of when ack_r signal clears
 --   Version 2.1 10/21/2014 Scott Larson
 --     Replaced gated clock with clock enable
 --     Adjusted timing of SCL during start and stop conditions
@@ -46,7 +46,7 @@ ENTITY i2c_master IS
     data_wr   : IN     STD_LOGIC_VECTOR(7 DOWNTO 0); --data to write to slave
     busy      : OUT    STD_LOGIC;                    --indicates transaction in progress
     data_rd   : OUT    STD_LOGIC_VECTOR(7 DOWNTO 0); --data read from slave
-    ack_error : BUFFER STD_LOGIC;                    --flag if improper acknowledge from slave
+    ack_error : OUT STD_LOGIC;                     --flag if improper acknowledge from slave
     sda       : INOUT  STD_LOGIC;                    --serial data output of i2c bus
     scl       : INOUT  STD_LOGIC);                   --serial clock output of i2c bus
 END i2c_master;
@@ -66,6 +66,7 @@ ARCHITECTURE logic OF i2c_master IS
   SIGNAL data_rx       : STD_LOGIC_VECTOR(7 DOWNTO 0);   --data received from slave
   SIGNAL bit_cnt       : INTEGER RANGE 0 TO 7 := 7;      --tracks bit number in transaction
   SIGNAL stretch       : STD_LOGIC := '0';               --identifies if slave is stretching scl
+  signal ack_r         : std_logic :='0';
 BEGIN
 
   --generate the timing for the bus clock (scl_clk) and the data clock (data_clk)
@@ -112,7 +113,7 @@ BEGIN
       busy <= '1';                         --indicate not available
       scl_ena <= '0';                      --sets scl high impedance
       sda_int <= '1';                      --sets sda high impedance
-      ack_error <= '0';                    --clear acknowledge error flag
+      ack_r <= '0';                    --clear acknowledge error flag
       bit_cnt <= 7;                        --restarts data bit counter
       data_rd <= "00000000";               --clear data read port
     ELSIF(clk'EVENT AND clk = '1') THEN
@@ -213,17 +214,17 @@ BEGIN
           WHEN start =>                  
             IF(scl_ena = '0') THEN                  --starting new transaction
               scl_ena <= '1';                       --enable scl output
-              ack_error <= '0';                     --reset acknowledge error output
+              ack_r <= '0';                     --reset acknowledge error output
             END IF;
           WHEN slv_ack1 =>                          --receiving slave acknowledge (command)
-            IF(sda /= '0' OR ack_error = '1') THEN  --no-acknowledge or previous no-acknowledge
-              ack_error <= '1';                     --set error output if no-acknowledge
+            IF(sda /= '0' OR ack_r = '1') THEN  --no-acknowledge or previous no-acknowledge
+              ack_r <= '1';                     --set error output if no-acknowledge
             END IF;
           WHEN rd =>                                --receiving slave data
             data_rx(bit_cnt) <= sda;                --receive current slave data bit
           WHEN slv_ack2 =>                          --receiving slave acknowledge (write)
-            IF(sda /= '0' OR ack_error = '1') THEN  --no-acknowledge or previous no-acknowledge
-              ack_error <= '1';                     --set error output if no-acknowledge
+            IF(sda /= '0' OR ack_r = '1') THEN  --no-acknowledge or previous no-acknowledge
+              ack_r <= '1';                     --set error output if no-acknowledge
             END IF;
           WHEN stop =>
             scl_ena <= '0';                         --disable scl
@@ -243,5 +244,6 @@ BEGIN
   --set scl and sda outputs
   scl <= '0' WHEN (scl_ena = '1' AND scl_clk = '0') ELSE 'Z';
   sda <= '0' WHEN sda_ena_n = '0' ELSE 'Z';
+  ACK_ERROR <= ack_reg;
   
 END logic;

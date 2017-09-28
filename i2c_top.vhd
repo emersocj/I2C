@@ -33,15 +33,16 @@ use IEEE.STD_LOGIC_1164.ALL;
 
 entity i2c_top is
   Port ( 
---  	INIT   			: in        std_logic;
---  	READ_ENABLE     : in        std_logic;
+  	INIT   			: in        std_logic;
+  	READ_ENABLE     : in        std_logic;
   	SDA				: inout		std_logic;
   	SCL             : inout	    std_logic;
---  	DATA_VLD		: out       std_logic;
---  	DATA_OUT        : out       std_logic_vector(17 downto 0);
+  	DATA_VLD		: out       std_logic;
+  	DATA_OUT        : out       std_logic_vector(17 downto 0);
 
+  	RESET_N			: in        std_logic;
     CLK 			: in 		std_logic
---  	RESET_N			: in        std_logic
+
   	);
 end i2c_top;
 
@@ -59,7 +60,7 @@ component i2c_userapp is
   	BUSY			: in 	 	std_logic;
   	INIT            : in 		std_logic;
   	READ_ENABLE     : in        std_logic;
-  	ACK_ERROR		: buffer 	std_logic;
+  	ACK_ERROR		: in 		std_logic;
   	RW				: out 		std_logic;
   	ADDR			: out 		std_logic_vector(6 downto 0);
   	ENA 			: out 		std_logic;
@@ -86,7 +87,7 @@ component i2c_master is
     DATA_WR   : in     std_logic_vector(7 downto 0); --data to write to slave
     BUSY      : out    std_logic;                    --indicates transaction in progress
     DATA_RD   : out    std_logic_vector(7 downto 0); --data read from slave
-    ACK_ERROR : buffer std_logic;                    --flag if improper acknowledge from slave
+    ACK_ERROR : out std_logic;                    --flag if improper acknowledge from slave
     SDA       : inout  std_logic;                    --serial data output of i2c bus
     SCL       : inout  std_logic;                    --serial clock output of i2c bus
 
@@ -121,7 +122,7 @@ port map(
 		SDA 		=> 	SDA,
 		SCL 		=>	SCL,
 
-		RESET_N 	=> 	'1',
+		RESET_N 	=> 	RESET_N,
 		CLK 		=> 	CLK
 );
 	
@@ -142,12 +143,12 @@ port map(
 		BUSY       => busy_i,
 		ACK_ERROR  => ack_error_i,
 
-		READ_ENABLE => '1',		
-		INIT       => '0',
-		DATA_VLD   => open,
-		DATA_OUT   => open,
+		READ_ENABLE => READ_ENABLE,		
+		INIT       => INIT,
+		DATA_VLD   => DATA_VLD,
+		DATA_OUT   => DATA_OUT,
 
-		RESET_N	   => '1',
+		RESET_N	   => RESET_N,
 		CLK        => CLK
 	);
 
